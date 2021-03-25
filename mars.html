@@ -1,0 +1,98 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AWSome week application">
+  <title>AWSome week application</title>
+  <link href="./css/theme.css" rel="stylesheet">
+  <link href="./css/theme-mine.css" rel="stylesheet">
+</head>
+
+<script>
+var numberOfItems=0;
+var items=[];
+const API='https://<your-api-address>.execute-api.eu-west-1.amazonaws.com/prod/item';
+
+function showItem( obj ) {
+  elem = document.getElementById("mars");
+  var x = (obj.x*elem.width/100);
+  var y = (obj.y*elem.height/100);
+  var item = document.createElement("IMG");
+  item.style="left:"+x+"px; top:"+y+"px; position: absolute; z-index:2";
+  item.setAttribute("src", "./css/rover.png");
+  item.setAttribute("width", "30");
+  item.setAttribute("height", "30");
+  item.setAttribute("title", obj.name);
+  document.getElementById("marsParent").appendChild(item);
+}
+function addItem( event) {
+  window.numberOfItems=window.numberOfItems+1;
+  var name="Jeździk"+window.numberOfItems;
+  elem = document.getElementById("mars");
+  var rect = elem.getBoundingClientRect();
+  var x = (event.clientX- rect.left-10)*100/elem.width;
+  var y = (event.clientY- rect.top-10)*100/elem.height;
+  item = {"id":window.numberOfItems,"x":x,"y":y,"name":name, "owner":"emi"};
+  saveItem(item);
+  window.items.push(item);
+  showItem(item );
+}
+function showResized(){
+  document.getElementById("marsParent").innerHTML= "<img  id=\"mars\" onclick=\"addItem(event)\" style=\"display: inline-block; vertical-align:top; position: relative; z-index:1;\" src=\"./css/mars.png\" width=\"100%\" >";
+  window.items.forEach(showItem);
+}
+const getAllItems = async () => {
+  const response = await fetch(API);
+  const myJson = await response.json(); 
+  myJson.Items.forEach(showItem)
+  myJson.Items.forEach(item=>window.items.push(item))
+
+}
+const saveItem = async (data) => { 
+  fetch(API, {
+    method: 'POST',
+    body: JSON.stringify(data), // string or object
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
+</script>
+<body class="" onresize="showResized()">
+  <nav id="sidebar" class="">
+    <div id="header-wrapper">
+      <div id="header">
+        <div id="aws-logo">
+          <img style="vertical-align:middle" src="./css/logo.png" height="70px">
+        </div>
+      </div>
+    </div>
+    <div class="highlightable ps-container ps-theme-default" style="height: 100%;">
+
+      <section id="prefooter" >
+      </section>
+      <section id="footer" style="position: absolute; bottom:68px">
+        <left><a href="https://aws.amazon.com/privacy/?nc1=f_pr">Privacy</a> | <a
+            href="https://aws.amazon.com/terms/?nc1=f_pr">Site Terms</a> | © 2021, Amazon Web Services, Inc. or its affiliates. All rights reserved.
+        </left>
+      </section>
+      <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;">
+        <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+      </div>
+      <div class="ps-scrollbar-y-rail" style="top: 0px; right: 0px; ">
+        <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; "></div>
+      </div>
+    </div>
+  </nav>
+  <section id="body">
+    <div id="overlay"><div id="head-tags"><h1>Hello Polish AWSome week geek!!!</h1></div></div>
+<div id="demo"></div>
+    <div id="marsParent" style="position: relative " >
+    <img  id="mars" onclick="addItem(event)" style="display: inline-block; vertical-align:top; position: relative; z-index:1;" src="./css/mars.png" width="100%" >
+  
+  </div>
+  </section>
+</body>
+<script>getAllItems()</script>
+
+</html>
